@@ -36,7 +36,8 @@ else:
 vertex_materials = np.array([material_properties(tuple(color)) for color in vertex_colors])
 
 # 法線ベクトルを計算
-mesh.compute_vertex_normals()
+# 修正(2026-10-29): trimesh の Trimesh に compute_vertex_normals は存在しない。
+# vertex_normals プロパティが自動で計算するため、そのまま取得する
 normals = mesh.vertex_normals
 
 # エッジを検出するための閾値
@@ -52,7 +53,9 @@ for edge in mesh.edges_unique:
         edges.append(edge)
 
 # 結果を表示
-edges = np.array(edges)
+# 修正(2026-10-29): エッジが検出されない場合、np.array([]) が float 型になり
+# 頂点のインデックスとして使えず IndexError になるため、int 型で整形する
+edges = np.array(edges, dtype=int).reshape(-1, 2)
 edge_points = mesh.vertices[edges]
 
 fig = plt.figure()
